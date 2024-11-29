@@ -10,12 +10,5 @@ if (POLICY CMP0141)
 endif()
 
 # Add source to this project's executable.
-if(WIN32)
-    add_executable (server server_window.cpp)
-    add_executable (client client_window.cpp)
-endif()
-if(UNIX)
-    add_executable (server server_linux.cpp)
-    add_executable (client client_linux.cpp)
-endif()
-
+add_executable (server server.cpp)
+add_executable (client client.cpp)
