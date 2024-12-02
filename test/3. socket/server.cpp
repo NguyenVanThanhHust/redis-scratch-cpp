@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <cstring>
 #include <sys/socket.h>
 #include <unistd.h>
 #include <iostream>
@@ -19,6 +20,7 @@ int main()
     int opt=1;
     socklen_t  addrlen = sizeof(address);
     char buffer[1024] = {0};
+    char* quit_signal = "exit";
     char* message="Hello from server";
 
     // Create socket file descriptor
@@ -52,23 +54,30 @@ int main()
         exit(EXIT_FAILURE);
     }
     
-    if ((new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen))< 0) {
-        perror("accept error");
-        exit(EXIT_FAILURE);
+    while (true)
+    {
+        if ((new_socket = accept(server_fd, (struct sockaddr*)&address, &addrlen))< 0) {
+            perror("accept error");
+            exit(EXIT_FAILURE);
+        }
+
+        // Receive from clinet
+        valread = read(new_socket, buffer, 1024 - 1); // subtract 1 for null terminator at the end
+        if (std::strcmp(buffer, quit_signal)==0)
+        {
+            // close the connected socket
+            cout<<"close connection"<<endl;
+            close(new_socket);
+            break;
+        }
+        else
+        {
+            // Send to client 
+            send(new_socket, message, strlen(message), 0);
+            cout<<"send message to client"<<endl;
+        }
+        // close the listenint socket
+        close(server_fd);
     }
-
-    // Receive from clinet
-    valread = read(new_socket, buffer, 1024 - 1); // subtract 1 for null terminator at the end
-    cout<<buffer<<endl;
-
-    // Send to client 
-    send(new_socket, message, strlen(message), 0);
-    cout<<"send message to client"<<endl;
-    
-    // close the connected socket
-    close(new_socket);
-
-    // close the listenint socket
-    close(server_fd);
     return 0;
 }

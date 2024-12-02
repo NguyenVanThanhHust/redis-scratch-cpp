@@ -12,6 +12,7 @@ int main()
     sockaddr_in server_addr;
 
     char* message = "hello from client";
+    // char* message = "exit";
     char buffer[1024] = {0};
     if ((client_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
     {
